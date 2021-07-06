@@ -1,4 +1,4 @@
-absl-py==0.10.0
+absl-py
 mailthon
 requests
 beautifulsoup4
