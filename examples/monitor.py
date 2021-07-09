@@ -1,30 +1,24 @@
-import argparse
 import json
-from absl import logging
 import os
 import threading
 from time import sleep
 from typing import Union
 
 import requests
+from absl import app
+from absl import flags
+from absl import logging
 from mailthon import postman, email
 
 from mercari import Mercari
 
+FLAGS = flags.FLAGS
 
-def get_script_arguments():
-    parser = argparse.ArgumentParser(description='Receive notifications every time new items matching '
-                                                 'your request parameters are available.')
-    parser.add_argument('--keywords', required=True, type=str, help='Keywords separated by a comma.')
-    parser.add_argument('--max_prices', required=True, type=str,
-                        help='Maximum price for each item separated by a comma.')
-    parser.add_argument('--min_prices', required=True, type=str,
-                        help='Minimum price for each item separated by a comma.')
-    parser.add_argument('--disable_alertzy', action='store_true')
-    parser.add_argument('--disable_gmail', action='store_true')
-    args = parser.parse_args()
-    logging.info(args)
-    return args
+flags.DEFINE_list('keywords', None, 'Keywords separated by a comma.')
+flags.DEFINE_list('max_prices', None, 'Maximum price for each item separated by a comma.')
+flags.DEFINE_list('min_prices', None, 'Minimum price for each item separated by a comma.')
+flags.DEFINE_bool('disable_gmail', False, '')
+flags.DEFINE_bool('disable_alertzy', False, '')
 
 
 class Alertzy:
@@ -181,18 +175,16 @@ class MonitorKeyword:
                 sleep(30)
 
 
-def main():
+def main(argv):
     logging.set_verbosity(logging.DEBUG)
-    args = get_script_arguments()
-    keywords = args.keywords.strip().split(',')
-    max_prices = [int(v) for v in args.max_prices.strip().split(',')]
-    min_prices = [int(v) for v in args.min_prices.strip().split(',')]
-    assert len(min_prices) == len(max_prices)
-    assert all([m1 < m2 for m1, m2 in zip(min_prices, max_prices)])
-    gmail = None if args.disable_gmail else GMailSender()
-    alertzy = None if args.disable_alertzy else Alertzy()
+    os.makedirs(FLAGS.log_dir, exist_ok=True)
+    logging.get_absl_handler().use_absl_log_file()
+    assert len(FLAGS.min_prices) == len(FLAGS.max_prices)
+    assert all([int(m1) < int(m2) for m1, m2 in zip(FLAGS.min_prices, FLAGS.max_prices)])
+    gmail = None if FLAGS.disable_gmail else GMailSender()
+    alertzy = None if FLAGS.disable_alertzy else Alertzy()
     monitors = []
-    for keyword, min_price, max_price in zip(keywords, min_prices, max_prices):
+    for keyword, min_price, max_price in zip(FLAGS.keywords, FLAGS.min_prices, FLAGS.max_prices):
         monitors.append(MonitorKeyword(keyword.strip(), min_price, max_price, gmail, alertzy))
     for monitor in monitors:
         monitor.start_monitoring()
@@ -203,4 +195,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    app.run(main)

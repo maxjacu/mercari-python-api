@@ -1,7 +1,6 @@
 FROM python:3.7-slim
 MAINTAINER Max Jacubowsky <maxjacu@gmail.com>
 
-# https://stackoverflow.com/questions/36710459/how-do-i-make-a-comment-in-a-dockerfile
 ARG DEBIAN_FRONTEND=noninteractive
 
 COPY . /app/
