@@ -89,10 +89,10 @@ class GMailSender:
                                      sender='{0} <{0}>'.format(self.gmail_user),
                                      receivers=[recipient],
                                      attachments=attachment))
-                    # logging.info(f'Email subject is {email_subject}.')
-                    # logging.info(f'Email content is {email_content}.')
-                    # logging.info(f'Attachment located at {attachment}.')
-                    # logging.info(f'Notification sent from {self.gmail_user} to {recipient}.')
+                    logging.info(f'Email subject is {email_subject}.')
+                    logging.info(f'Email content is {email_content}.')
+                    logging.info(f'Attachment located at {attachment}.')
+                    logging.info(f'Notification sent from {self.gmail_user} to {recipient}.')
                     assert r.ok
 
 
@@ -138,7 +138,7 @@ class MonitorKeyword:
             self.persisted_items.append(new_item)
             item = self.mercari.get_item_info(new_item)
             if self.keyword.lower() in item.name.lower() and item.is_new and item.in_stock:
-                logging.info(f'[{self.keyword}] New item detected: {new_item}.')
+                logging.debug(f'[{self.keyword}] New item detected: {new_item}.')
                 email_subject = f'{item.name} {item.price}'
                 email_subject_with_url = f'{email_subject} {item.url}'
                 email_content = f'{item.url}<br/><br/>{item.desc}'
@@ -154,8 +154,6 @@ class MonitorKeyword:
                 if self.gmail_sender is not None:
                     logging.info('Will send a GMAIL notification.')
                     self.gmail_sender.send_email_notification(email_subject, email_content, attachment)
-                # else:
-                #     logging.info('Will skip GMAIL.')
 
     # noinspection PyBroadException
     def _run(self):
@@ -176,7 +174,7 @@ class MonitorKeyword:
 
 
 def main(argv):
-    logging.set_verbosity(logging.DEBUG)
+    logging.set_verbosity(logging.INFO)
     os.makedirs(FLAGS.log_dir, exist_ok=True)
     logging.get_absl_handler().use_absl_log_file()
     assert len(FLAGS.min_prices) == len(FLAGS.max_prices)
