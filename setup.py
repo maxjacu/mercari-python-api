@@ -4,10 +4,10 @@ from setuptools import setup
 setup(
     name='mercari-python-us',
     version='0.5',
-    author='Philippe Remy',
+    author='Max Jacubowsky',
     packages=find_packages(),
     install_requires=[
-        'absl-py'
+        'absl-py',
         'mailthon',
         'requests',
         'beautifulsoup4',
