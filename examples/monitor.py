@@ -175,6 +175,7 @@ class MonitorKeyword:
 
 def main(argv):
     logging.set_verbosity(logging.INFO)
+
     os.makedirs(FLAGS.log_dir, exist_ok=True)
     logging.get_absl_handler().use_absl_log_file()
     assert len(FLAGS.min_prices) == len(FLAGS.max_prices)
