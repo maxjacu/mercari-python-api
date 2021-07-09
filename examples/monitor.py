@@ -19,7 +19,7 @@ flags.DEFINE_list('max_prices', None, 'Maximum price for each item separated by 
 flags.DEFINE_list('min_prices', None, 'Minimum price for each item separated by a comma.')
 flags.DEFINE_bool('disable_gmail', False, '')
 flags.DEFINE_bool('disable_alertzy', False, '')
-
+flags.DEFINE_string('alertzy_key', None, 'Get your key here https://alertzy.app/')
 
 class Alertzy:
 
@@ -29,8 +29,8 @@ class Alertzy:
         config_filename = 'alertzy_conf.json'
         if os.path.isfile(config_filename):
             with open(config_filename, 'r') as r:
-                self.alertzy_key = json.load(r)['alertzy_key']
-            # self.send_notification('Monitoring has started.', title='Mercari')
+                self.alertzy_key = FLAGS.alertzy_key
+            self.send_notification('Monitoring has started.', title='Mercari')
         else:
             self.use_module = False
             logging.warning('Alertzy was not configured. Notifications will not be sent to your '
@@ -175,7 +175,6 @@ class MonitorKeyword:
 
 def main(argv):
     logging.set_verbosity(logging.INFO)
-
     os.makedirs(FLAGS.log_dir, exist_ok=True)
     logging.get_absl_handler().use_absl_log_file()
     assert len(FLAGS.min_prices) == len(FLAGS.max_prices)
