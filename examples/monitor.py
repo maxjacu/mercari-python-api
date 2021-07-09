@@ -21,20 +21,19 @@ flags.DEFINE_bool('disable_gmail', False, '')
 flags.DEFINE_bool('disable_alertzy', False, '')
 flags.DEFINE_string('alertzy_key', None, 'Get your key here https://alertzy.app/')
 
+
 class Alertzy:
 
     def __init__(self):
         self.use_module = True
         self.lock = threading.Lock()
-        config_filename = 'alertzy_conf.json'
-        if os.path.isfile(config_filename):
-            with open(config_filename, 'r') as r:
-                self.alertzy_key = FLAGS.alertzy_key
-            self.send_notification('Monitoring has started.', title='Mercari')
-        else:
+        self.alertzy_key = FLAGS.alertzy_key
+        if not self.alertzy_key:
             self.use_module = False
             logging.warning('Alertzy was not configured. Notifications will not be sent to your '
                             'iPhone through the Alertzy app.')
+        else:
+            self.send_notification('Monitoring has started.', title='Mercari')
 
     def send_notification(self, message, title, url=None, image_url=None):
         # https://alertzy.app/
