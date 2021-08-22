@@ -136,8 +136,10 @@ class MonitorKeyword:
             logging.debug(f'[{self.keyword}] New Url: {new_item}.')
             self.persisted_items.append(new_item)
             item = self.mercari.get_item_info(new_item)
+            # Check if keyword is in title
             if self.keyword.lower() in item.name.lower() and item.is_new and item.in_stock:
                 logging.debug(f'[{self.keyword}] New item detected: {new_item}.')
+
                 email_subject = f'{item.name} {item.price}'
                 email_subject_with_url = f'{email_subject} {item.url}'
                 email_content = f'{item.url}<br/><br/>{item.desc}'
@@ -153,6 +155,15 @@ class MonitorKeyword:
                 if self.gmail_sender is not None:
                     logging.info('Will send a GMAIL notification.')
                     self.gmail_sender.send_email_notification(email_subject, email_content, attachment)
+            else:
+                if not self.keyword.lower() in item.name.lower():
+                    logging.debug("Keyword not in item name")
+                elif not item.is_new:
+                    logging.debug("Item is actually not new")
+                elif not item.recently_edited:
+                    logging.debug("Item wasn't edited recently")
+                else:
+                    logging.debug("Item already out of stock")
 
     # noinspection PyBroadException
     def _run(self):

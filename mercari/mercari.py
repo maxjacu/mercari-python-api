@@ -55,16 +55,17 @@ class Mercari(Common):
         name = str(soup.find('meta', {'property': 'og:title'})["content"])
         desc = soup.find('meta', {'property': 'og:description'})["content"]
         condition = soup.find('meta', {'itemprop': 'itemCondition'})["content"]  # TODO: Filter to Like new
-        new_label = soup.find('span', class_=lambda t: t and "Blue" in t, text='New')
-        recently_edited = soup.find('p', class_=lambda c: c and "Text__T4" in c,
-                                    text=lambda t: 'minute' in t)
-        is_new = True if new_label and recently_edited else False
+        new_label = True if soup.find('p', class_=lambda t: t and "Text__T4" in t,
+                              text=lambda t: 'New!' in t) else False
+        recently_edited = True if soup.find('p', class_=lambda c: c and "Text__T4" in c,
+                                    text=lambda t: 'minute' in t) else False
         # TODO Add Tags: Tags__TagLink
         in_stock = True if soup.find('meta', {'property': 'og:availability'}, content='instock') else False
 
         photo = str(soup.find('meta', {'property': 'og:image'})["content"])
 
-        item = Item(name=name, price=price, desc=desc, condition=condition, is_new=is_new, in_stock=in_stock,
+        item = Item(name=name, price=price, desc=desc, condition=condition, is_new=new_label,
+                    recently_edited=recently_edited, in_stock=in_stock,
                     url_photo=photo, url=item_url)
         return item
 

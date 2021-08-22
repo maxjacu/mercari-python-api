@@ -17,6 +17,7 @@ class Item:
                  desc: str,
                  condition: str,
                  is_new: bool,
+                 recently_edited: bool,
                  in_stock: bool,
                  url_photo: str,
                  url: str):
@@ -33,6 +34,7 @@ class Item:
         self.desc = desc
         self.condition = condition
         self.is_new = is_new
+        self.recently_edited = recently_edited
         self.in_stock = in_stock
         self.url_photo = url_photo
         self.url = url
