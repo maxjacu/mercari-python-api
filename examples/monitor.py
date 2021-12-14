@@ -166,11 +166,10 @@ class MonitorKeyword:
                     logging.debug("Item already out of stock")
 
     # noinspection PyBroadException
-    def _run(self):
+    def _run(self, time_between_two_requests=120):
         logging.info(f'[{self.keyword}] Starting monitoring with price_max: {self.price_max} '
                      f'and price_min: {self.price_min}.')
         self.scrape_outstanding_items()
-        time_between_two_requests = 60
         logging.info(f'We will check the first page(s) every {time_between_two_requests} seconds '
                      f'and look for new items.')
         logging.info('The program has started to monitor for new items...')
@@ -180,12 +179,11 @@ class MonitorKeyword:
                 self.check_for_new_items()
             except Exception:
                 logging.exception('exception')
-                sleep(30)
+                sleep(time_between_two_requests)
 
 
-def main(argv):
+def main(_):
     logging.set_verbosity(logging.INFO)
-    os.makedirs(FLAGS.log_dir, exist_ok=True)
     logging.get_absl_handler().use_absl_log_file()
     assert len(FLAGS.min_prices) == len(FLAGS.max_prices)
     assert all([int(m1) < int(m2) for m1, m2 in zip(FLAGS.min_prices, FLAGS.max_prices)])
